@@ -9,7 +9,50 @@ library(xlsx)
 library(leaflet)
 
 data("mydata")
+#pollution Rose
 
+pollutionRose <- function(mydata, pollutant = "nox", key.footer = pollutant,
+                          key.position = "right", key = TRUE,
+                          breaks = 6, paddle = FALSE, seg = 0.9, normalise = FALSE,
+                          ...) {
+  
+  ## extra args setup
+  extra <- list(...)
+  
+  ## check to see if two met data sets are being compared.
+  ## if so, set pollutant to one of the names
+  if ("ws2" %in% names(extra)) {
+    pollutant <- extra$ws
+    if (missing(breaks)) breaks <- NA
+  }
+  
+  if (is.null(breaks)) breaks <- 6
+  
+  if (is.numeric(breaks) & length(breaks) == 1) {
+    
+    ## breaks from the minimum to 90th percentile, which generally gives sensible
+    ## spacing for skewed data. Maximum is added later.
+    breaks <- unique(pretty(c(
+      min(mydata[[pollutant]], na.rm = TRUE),
+      quantile(mydata[[pollutant]], probs = 0.9, na.rm = TRUE),
+      breaks
+    )))
+  }
+  
+  windRose(
+    mydata,
+    pollutant = pollutant, paddle = paddle, seg = seg,
+    key.position = key.position, key.footer = key.footer, key = key,
+    breaks = breaks, normalise = normalise, ...
+  )
+}
+
+plot(pollutionRose(mydata), col.data= "viridis")#color = pollution concentratzin, bars= direction/speed of wind
+
+polarPlot(mydata, pollutant = "nox", col.data = "black")
+
+polarAnnulus(mydata, pollutant= "nox")# period= "season")
+#####################################AirQ######################################################################
 summaryPlot(selectByDate(mydata, year=c(2000,2001)), type = "density",
             avg.time = "hour", period= "months", col.data = "grey")
 
