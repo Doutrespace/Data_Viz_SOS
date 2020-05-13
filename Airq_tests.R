@@ -1,12 +1,18 @@
 ### Air Quality
 install.packages("openair")
 install.packages("xlsx")
+install.packages("geojsonio")
 library(openair)
 library(ggplot2)
 library(circlize)
 library(mapview)
 library(xlsx)
 library(leaflet)
+library(tidyverse)
+library(geojsonio)
+library(RColorBrewer)
+library(rgdal)
+
 
 data("mydata")
 #pollution Rose
@@ -48,6 +54,26 @@ pollutionRose <- function(mydata, pollutant = "nox", key.footer = pollutant,
 }
 
 plot(pollutionRose(mydata), col.data= "viridis")#color = pollution concentratzin, bars= direction/speed of wind
+
+pollutionRose(mydata, ws= "ws", wd = "wd",
+              pollutant = "nox",
+              breaks = c(0,50,100,200,350,500),
+              auto.text=  FALSE,
+              paddle = FALSE,
+              annotate= FALSE,
+              grid.line = 5,
+              key.header = "EAGLE ROSE",
+              key = list(labels= c(">0-50",
+                                  ">50-100",
+                                  ">100-150",
+                                  ">150-200",
+                                  ">200-250",
+                                  ">250-300",
+                                  ">350-500")),
+              key.footer = expression(paste(NO[x]~"(","ppb",")")),
+              key.position= "bottom",
+              par.settings=list(axis.line=list(col="lightgray")),
+              col= c("#4f4f4f", "#0a7cb9","#f9be00", "#ff7f2f","#d7153a"))
 
 polarPlot(mydata, pollutant = "nox", col.data = "black")
 
