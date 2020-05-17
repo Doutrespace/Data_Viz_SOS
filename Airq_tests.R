@@ -2,6 +2,10 @@
 install.packages("openair")
 install.packages("xlsx")
 install.packages("geojsonio")
+install.packages("spData")
+install.packages("spDataLarge")
+install.packages("tmap")
+library(tmap)
 library(openair)
 library(ggplot2)
 library(circlize)
@@ -12,7 +16,11 @@ library(tidyverse)
 library(geojsonio)
 library(RColorBrewer)
 library(rgdal)
-
+library(sf)
+library(raster)
+library(dplyr)
+library(spData)
+library(spDataLarge)
 
 data("mydata")
 #pollution Rose
@@ -112,3 +120,64 @@ trajPlot(selectByDate(traj,year = 2005, month = 1), group = "day")
 
 newDf <- merge(traj, selectByDate(data, year  = 2005))
 trajPlot(selectByDate(newDf, year = 2005, month=1), pollutant = "nox")
+
+############################################################################################################
+
+
+
+meanNDVI_HARV_2011 <- read_csv("files/NEON-DS-Met-Time-Series/HARV/NDVI/meanNDVI_HARV_2011.csv")
+
+### new zeeland
+
+
+
+tm_shape(nz) +
+  tm_fill() 
+# Add border layer to nz shape
+tm_shape(nz) +
+  tm_borders() 
+# Add fill and border layers to nz shape
+tm_shape(nz) +
+  tm_fill() +
+  tm_borders() 
+tm_shape(nz) + tm_fill(col = "Land_area")
+legend_title = expression("Area (km"^2*")")
+map_nza = tm_shape(nz) +
+  tm_fill(col = "Land_area", title = legend_title) + tm_borders()
+
+tm_shape(nz) + tm_polygons(col = "Median_income", palette = "BuGn")
+tm_shape(nz) + tm_polygons(col = "Median_income", palette = "GnBu")
+tm_shape(nz) + tm_polygons(col = "Median_income", palette = "PuBuGn")
+tm_shape(nz) + tm_polygons(col = "Median_income", palette = "YlGnBu")
+
+
+
+
+##########################log-scale############################################
+graph <- ggplot(df, aes(x = Date, y = meanNDVI, colour = meanNDVI)) +
+  geom_point() +
+  theme_light()
+graph
+
+ggplot(meanNDVI_HARV_2011) +
+ aes(x = Date, y = meanNDVI) +
+ geom_line(size = 0.88, colour = "#35b779") +
+ scale_y_continuous(trans = "atanh") +
+ labs(title = "Mean NDVI in one year") +
+ theme_light()
+
+ggplot(meanNDVI_HARV_2011) +
+ aes(x = Date, y = meanNDVI) +
+ geom_line(size = 0.88, colour = "#35b779") +
+ scale_y_continuous(trans = "log") +
+ labs(title = "Mean NDVI in one year") +
+ theme_light()
+
+
+
+
+
+
+
+
+
